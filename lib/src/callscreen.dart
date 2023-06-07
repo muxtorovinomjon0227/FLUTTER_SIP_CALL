@@ -1,26 +1,29 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
-import 'widgets/action_button.dart';
 import 'package:sip_ua/sip_ua.dart';
 
+import 'widgets/action_button.dart';
+
 class CallScreenWidget extends StatefulWidget {
-  final SIPUAHelper _helper;
-  final Call _call;
+  final SIPUAHelper? _helper;
+  final Call? _call;
   CallScreenWidget(this._helper, this._call, {Key? key}) : super(key: key);
   @override
   _MyCallScreenWidget createState() => _MyCallScreenWidget();
 }
 
-class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelperListener {
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  late double _localVideoHeight;
-  late double _localVideoWidth;
-  late EdgeInsetsGeometry _localVideoMargin;
-  late MediaStream _localStream;
-  late MediaStream _remoteStream;
+class _MyCallScreenWidget extends State<CallScreenWidget>
+    implements SipUaHelperListener {
+  RTCVideoRenderer? _localRenderer = RTCVideoRenderer();
+  RTCVideoRenderer? _remoteRenderer = RTCVideoRenderer();
+  double? _localVideoHeight;
+  double? _localVideoWidth;
+  EdgeInsetsGeometry? _localVideoMargin;
+  MediaStream? _localStream;
+  MediaStream? _remoteStream;
 
   bool _showNumPad = false;
   String _timeLabel = '00:00';
@@ -29,32 +32,32 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
   bool _videoMuted = false;
   bool _speakerOn = false;
   bool _hold = false;
-  late String _holdOriginator;
+  String? _holdOriginator;
   CallStateEnum _state = CallStateEnum.NONE;
-  SIPUAHelper get helper => widget._helper;
+  SIPUAHelper? get helper => widget._helper;
 
-  bool get voiceonly =>
-      (_localStream == null || _localStream.getVideoTracks().isEmpty) &&
-      (_remoteStream == null || _remoteStream.getVideoTracks().isEmpty);
+  bool get voiceOnly =>
+      (_localStream == null || _localStream!.getVideoTracks().isEmpty) &&
+          (_remoteStream == null || _remoteStream!.getVideoTracks().isEmpty);
 
-  String? get remote_identity => call.remote_identity;
+  String? get remoteIdentity => call!.remote_identity;
 
-  String get direction => call.direction;
+  String get direction => call!.direction;
 
-  Call get call => widget._call;
+  Call? get call => widget._call;
 
   @override
   initState() {
     super.initState();
     _initRenderers();
-    helper.addSipUaHelperListener(this);
+    helper!.addSipUaHelperListener(this);
     _startTimer();
   }
 
   @override
   deactivate() {
     super.deactivate();
-    helper.removeSipUaHelperListener(this);
+    helper!.removeSipUaHelperListener(this);
     _disposeRenderers();
   }
 
@@ -62,7 +65,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       Duration duration = Duration(seconds: timer.tick);
       if (mounted) {
-        this.setState(() {
+        setState(() {
           _timeLabel = [duration.inMinutes, duration.inSeconds]
               .map((seg) => seg.remainder(60).toString().padLeft(2, '0'))
               .join(':');
@@ -71,25 +74,28 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
         _timer.cancel();
       }
     });
+
+    _localRenderer = new RTCVideoRenderer();
+    _localRenderer?.initialize();
   }
 
   void _initRenderers() async {
     if (_localRenderer != null) {
-      await _localRenderer.initialize();
+      await _localRenderer!.initialize();
     }
     if (_remoteRenderer != null) {
-      await _remoteRenderer.initialize();
+      await _remoteRenderer!.initialize();
     }
   }
 
   void _disposeRenderers() {
     if (_localRenderer != null) {
-      _localRenderer.dispose();
-      // _localRenderer = null;
+      _localRenderer!.dispose();
+      _localRenderer = null;
     }
     if (_remoteRenderer != null) {
-      _remoteRenderer.dispose();
-      // _remoteRenderer = null;
+      _remoteRenderer!.dispose();
+      _remoteRenderer = null;
     }
   }
 
@@ -98,22 +104,22 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
     if (callState.state == CallStateEnum.HOLD ||
         callState.state == CallStateEnum.UNHOLD) {
       _hold = callState.state == CallStateEnum.HOLD;
-      _holdOriginator = callState.originator!;
+      _holdOriginator = callState.originator;
       setState(() {});
       return;
     }
 
     if (callState.state == CallStateEnum.MUTED) {
-      if (callState.audio ?? false) _audioMuted = true;
-      if (callState.video ?? true) _videoMuted = true;
-      this.setState(() {});
+      if (callState.audio!) _audioMuted = true;
+      if (callState.video!) _videoMuted = true;
+      setState(() {});
       return;
     }
 
     if (callState.state == CallStateEnum.UNMUTED) {
-      if (callState.audio ?? false) _audioMuted = false;
-      if (callState.video ?? true) _videoMuted = false;
-      this.setState(() {});
+      if (callState.audio!) _audioMuted = false;
+      if (callState.video!) _videoMuted = false;
+      setState(() {});
       return;
     }
 
@@ -150,30 +156,42 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
   @override
   void registrationStateChanged(RegistrationState state) {}
 
+  void _cleanUp() {
+    if (_localStream == null) return;
+    _localStream?.getTracks().forEach((track) {
+      track.stop();
+    });
+    _localStream!.dispose();
+    _localStream = null;
+  }
+
   void _backToDialPad() {
     _timer.cancel();
     Timer(Duration(seconds: 2), () {
       Navigator.of(context).pop();
     });
+    _cleanUp();
   }
 
   void _handelStreams(CallState event) async {
     MediaStream? stream = event.stream;
     if (event.originator == 'local') {
       if (_localRenderer != null) {
-        _localRenderer.srcObject = stream;
+        _localRenderer!.srcObject = stream;
       }
-      event.stream?.getAudioTracks()?.first?.enableSpeakerphone(false);
-      _localStream = stream!;
+      if (!kIsWeb && !WebRTC.platformIsDesktop) {
+        event.stream?.getAudioTracks().first.enableSpeakerphone(false);
+      }
+      _localStream = stream;
     }
     if (event.originator == 'remote') {
       if (_remoteRenderer != null) {
-        _remoteRenderer.srcObject = stream;
+        _remoteRenderer!.srcObject = stream;
       }
-      _remoteStream = stream!;
+      _remoteStream = stream;
     }
 
-    this.setState(() {
+    setState(() {
       _resizeLocalVideo();
     });
   }
@@ -191,47 +209,67 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
   }
 
   void _handleHangup() {
-    call.hangup();
+    call!.hangup({'status_code': 603});
     _timer.cancel();
   }
 
-  void _handleAccept() {
-    call.answer(helper.buildCallOptions());
+  void _handleAccept() async {
+    bool remoteHasVideo = call!.remote_has_video;
+    final mediaConstraints = <String, dynamic>{
+      'audio': true,
+      'video': remoteHasVideo
+    };
+    MediaStream mediaStream;
+
+    if (kIsWeb && remoteHasVideo) {
+      mediaStream =
+      await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+      mediaConstraints['video'] = false;
+      MediaStream userStream =
+      await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      mediaStream.addTrack(userStream.getAudioTracks()[0], addToNative: true);
+    } else {
+      mediaConstraints['video'] = remoteHasVideo;
+      mediaStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    }
+
+    call!.answer(helper!.buildCallOptions(!remoteHasVideo),
+        mediaStream: mediaStream);
   }
 
   void _switchCamera() {
     if (_localStream != null) {
-      _localStream.getVideoTracks()[0].switchCamera();
+      Helper.switchCamera(_localStream!.getVideoTracks()[0]);
     }
   }
 
   void _muteAudio() {
     if (_audioMuted) {
-      call.unmute(true, false);
+      call!.unmute(true, false);
     } else {
-      call.mute(true, false);
+      call!.mute(true, false);
     }
   }
 
   void _muteVideo() {
     if (_videoMuted) {
-      call.unmute(false, true);
+      call!.unmute(false, true);
     } else {
-      call.mute(false, true);
+      call!.mute(false, true);
     }
   }
 
   void _handleHold() {
     if (_hold) {
-      call.unhold();
+      call!.unhold();
     } else {
-      call.hold();
+      call!.hold();
     }
   }
 
-  late String _tansfer_target;
+  late String _transferTarget;
   void _handleTransfer() {
-    showDialog<Null>(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
@@ -240,7 +278,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
           content: TextField(
             onChanged: (String text) {
               setState(() {
-                _tansfer_target = text;
+                _transferTarget = text;
               });
             },
             decoration: InputDecoration(
@@ -252,7 +290,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
             TextButton(
               child: Text('Ok'),
               onPressed: () {
-                call.refer(_tansfer_target);
+                call!.refer(_transferTarget);
                 Navigator.of(context).pop();
               },
             ),
@@ -270,11 +308,11 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
 
   void _handleDtmf(String tone) {
     print('Dtmf tone => $tone');
-    call.sendDTMF(tone);
+    call!.sendDTMF(tone);
   }
 
   void _handleKeyPad() {
-    this.setState(() {
+    setState(() {
       _showNumPad = !_showNumPad;
     });
   }
@@ -282,12 +320,14 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
   void _toggleSpeaker() {
     if (_localStream != null) {
       _speakerOn = !_speakerOn;
-      _localStream.getAudioTracks()[0].enableSpeakerphone(_speakerOn);
+      if (!kIsWeb) {
+        _localStream!.getAudioTracks()[0].enableSpeakerphone(_speakerOn);
+      }
     }
   }
 
   List<Widget> _buildNumPad() {
-    var lables = [
+    var labels = [
       [
         {'1': ''},
         {'2': 'abc'},
@@ -310,19 +350,19 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
       ],
     ];
 
-    return lables
+    return labels
         .map((row) => Padding(
-            padding: const EdgeInsets.all(3),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: row
-                    .map((label) => ActionButton(
-                          title: '${label.keys.first}',
-                          subTitle: '${label.values.first}',
-                          onPressed: () => _handleDtmf(label.keys.first),
-                          number: true,
-                        ))
-                    .toList())))
+        padding: const EdgeInsets.all(3),
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: row
+                .map((label) => ActionButton(
+              title: label.keys.first,
+              subTitle: label.values.first,
+              onPressed: () => _handleDtmf(label.keys.first),
+              number: true,
+            ))
+                .toList())))
         .toList();
   }
 
@@ -369,7 +409,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
             onPressed: () => _muteAudio(),
           ));
 
-          if (voiceonly) {
+          if (voiceOnly) {
             advanceActions.add(ActionButton(
               title: "keypad",
               icon: Icons.dialpad,
@@ -383,7 +423,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
             ));
           }
 
-          if (voiceonly) {
+          if (voiceOnly) {
             advanceActions.add(ActionButton(
               title: _speakerOn ? 'speaker off' : 'speaker on',
               icon: _speakerOn ? Icons.volume_off : Icons.volume_up,
@@ -464,16 +504,16 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
   Widget _buildContent() {
     var stackWidgets = <Widget>[];
 
-    if (!voiceonly && _remoteStream != null) {
+    if (!voiceOnly && _remoteStream != null) {
       stackWidgets.add(Center(
-        child: RTCVideoView(_remoteRenderer),
+        child: RTCVideoView(_remoteRenderer!),
       ));
     }
 
-    if (!voiceonly && _localStream != null) {
+    if (!voiceOnly && _localStream != null) {
       stackWidgets.add(Container(
         child: AnimatedContainer(
-          child: RTCVideoView(_localRenderer),
+          child: RTCVideoView(_localRenderer!),
           height: _localVideoHeight,
           width: _localVideoWidth,
           alignment: Alignment.topRight,
@@ -486,38 +526,38 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
 
     stackWidgets.addAll([
       Positioned(
-        top: voiceonly ? 48 : 6,
+        top: voiceOnly ? 48 : 6,
         left: 0,
         right: 0,
         child: Center(
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Text(
-                      (voiceonly ? 'VOICE CALL' : 'VIDEO CALL') +
-                          (_hold
-                              ? ' PAUSED BY ${this._holdOriginator.toUpperCase()}'
-                              : ''),
-                      style: TextStyle(fontSize: 24, color: Colors.black54),
-                    ))),
-            Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Text(
-                      '$remote_identity',
-                      style: TextStyle(fontSize: 18, color: Colors.black54),
-                    ))),
-            Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Text(_timeLabel,
-                        style: TextStyle(fontSize: 14, color: Colors.black54))))
-          ],
-        )),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Text(
+                          (voiceOnly ? 'VOICE CALL' : 'VIDEO CALL') +
+                              (_hold
+                                  ? ' PAUSED BY ${_holdOriginator!.toUpperCase()}'
+                                  : ''),
+                          style: TextStyle(fontSize: 24, color: Colors.black54),
+                        ))),
+                Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Text(
+                          '$remoteIdentity',
+                          style: TextStyle(fontSize: 18, color: Colors.black54),
+                        ))),
+                Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Text(_timeLabel,
+                            style: TextStyle(fontSize: 14, color: Colors.black54))))
+              ],
+            )),
       ),
     ]);
 
@@ -548,5 +588,6 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
 
   @override
   void onNewNotify(Notify ntf) {
+    // NO OP
   }
 }
