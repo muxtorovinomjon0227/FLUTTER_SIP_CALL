@@ -11,14 +11,14 @@ class RegisterWidget extends StatefulWidget {
 
 class _MyRegisterWidget extends State<RegisterWidget>
     implements SipUaHelperListener {
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _wsUriController = TextEditingController();
-  TextEditingController _sipUriController = TextEditingController();
-  TextEditingController _displayNameController = TextEditingController();
-  TextEditingController _authorizationUserController = TextEditingController();
-  Map<String, String> _wsExtraHeaders = {
-    'Origin': ' https://tryit.jssip.net',
-    'Host': 'tryit.jssip.net:10443'
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _wsUriController = TextEditingController();
+  final TextEditingController _sipUriController = TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
+  final TextEditingController _authorizationUserController = TextEditingController();
+  final Map<String, String> _wsExtraHeaders = {
+    'Origin': 'https://cld.alovoice.uz',
+    'Host': 'cld.alovoice.uz:61040'
   };
   late SharedPreferences _preferences;
   late RegistrationState _registerState;
@@ -30,47 +30,47 @@ class _MyRegisterWidget extends State<RegisterWidget>
     super.initState();
     _registerState = helper.registerState;
     helper.addSipUaHelperListener(this);
-    _loadSettings();
+    // _loadSettings();
   }
 
   @override
   deactivate() {
     super.deactivate();
     helper.removeSipUaHelperListener(this);
-    _saveSettings();
+    // _saveSettings();
   }
-
-  void _loadSettings() async {
-    _preferences = await SharedPreferences.getInstance();
-    this.setState(() {
-      _wsUriController.text =
-          _preferences.getString('ws_uri') ?? 'wss://tryit.jssip.net:10443';
-      _sipUriController.text =
-          _preferences.getString('sip_uri') ?? 'hello_flutter@tryit.jssip.net';
-      _displayNameController.text =
-          _preferences.getString('display_name') ?? 'Flutter SIP UA';
-      _passwordController.text = _preferences.getString('password')!;
-      _authorizationUserController.text = _preferences.getString('auth_user')!;
-    });
-  }
-
-  void _saveSettings() {
-    _preferences.setString('ws_uri', _wsUriController.text);
-    _preferences.setString('sip_uri', _sipUriController.text);
-    _preferences.setString('display_name', _displayNameController.text);
-    _preferences.setString('password', _passwordController.text);
-    _preferences.setString('auth_user', _authorizationUserController.text);
-  }
+  //
+  // void _loadSettings() async {
+  //   _preferences = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     _wsUriController.text =
+  //         _preferences.getString('ws_uri') ?? 'wss://cld.alovoice.uz:61040';
+  //     _sipUriController.text =
+  //         _preferences.getString('sip_uri') ?? 'https://cld.alovoice.uz:65040';
+  //     _displayNameController.text =
+  //         _preferences.getString('display_name') ?? 'Flutter SIP UA';
+  //     _passwordController.text = _preferences.getString('password') ?? '8b1e39';
+  //     _authorizationUserController.text = _preferences.getString('auth_user') ?? "3006";
+  //   });
+  // }
+  //
+  // void _saveSettings() {
+  //   _preferences.setString('ws_uri', _wsUriController.text);
+  //   _preferences.setString('sip_uri', _sipUriController.text);
+  //   _preferences.setString('display_name', _displayNameController.text);
+  //   _preferences.setString('password', _passwordController.text);
+  //   _preferences.setString('auth_user', _authorizationUserController.text);
+  // }
 
   @override
   void registrationStateChanged(RegistrationState state) {
-    this.setState(() {
+    setState(() {
       _registerState = state;
     });
   }
 
   void _alert(BuildContext context, String alertFieldName) {
-    showDialog<Null>(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
@@ -90,12 +90,25 @@ class _MyRegisterWidget extends State<RegisterWidget>
     );
   }
 
+
+   void registeredSip() async {
+    UaSettings settings = UaSettings();
+    settings.webSocketUrl = 'ws://cld.alovoice.uz:61040/ws';
+    settings.webSocketSettings.allowBadCertificate = true;
+    var uri = '3006@cld.alovoice.uz';
+    settings.uri = uri;
+    settings.authorizationUser =  "3006";
+    settings.password = "8b1e39";
+    settings.displayName = "3006";
+    helper.start(settings);
+    print("Bu yerda connect bo'lgani ${helper.connected}");
+    print("Bu yerda connect bo'lgani ${helper.connecting}");
+  }
+
+
+
   void _handleSave(BuildContext context) {
-    if (_wsUriController.text == null) {
-      _alert(context, "WebSocket URL");
-    } else if (_sipUriController.text == null) {
-      _alert(context, "SIP URI");
-    }
+
 
     UaSettings settings = UaSettings();
 
@@ -114,14 +127,53 @@ class _MyRegisterWidget extends State<RegisterWidget>
     helper.start(settings);
   }
 
+  // void _handleSave(BuildContext context) {
+  //
+  //   UaSettings settings = UaSettings();
+  //   settings.webSocketUrl = "wss://cld.alovoice.uz:61040";
+  //   settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
+  //   settings.webSocketSettings.allowBadCertificate = true;
+  //   settings.uri = "sip:3006@cld.alovoice.uz";
+  //   settings.authorizationUser = "3006";
+  //   settings.password = "8b1e39";
+  //   settings.displayName = "3006";
+  //   settings.userAgent = 'Dart SIP Client v1.0.0';
+  //   settings.dtmfMode = DtmfMode.RFC2833;
+  //
+  //   helper.start(settings);
+  // }
+
+  // void _handleSave(BuildContext context) {
+  //   // if (_wsUriController.text == null) {
+  //   //   _alert(context, "WebSocket URL");
+  //   // } else if (_sipUriController.text == null) {
+  //   //   _alert(context, "SIP URI");
+  //   // }
+  //
+  //   UaSettings settings = UaSettings();
+  //
+  //   settings.webSocketUrl = "wss://cld.alovoice.uz:61040";
+  //   settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
+  //   settings.webSocketSettings.allowBadCertificate = true;
+  //   // settings.webSocketSettings.userAgent = 'Dart/2.8 (dart:io) for OpenSIPS.';
+  //   settings.uri = "3006@cld.alovoice.uz:65040";
+  //   settings.authorizationUser = "3006";
+  //   settings.password = "8b1e39";
+  //   settings.displayName = "8b1e39";
+  //   settings.userAgent = 'Dart SIP Client';
+  //   settings.dtmfMode = DtmfMode.RFC2833;
+  //
+  //   helper.start(settings);
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("SIP Account"),
+          title: const Text("SIP Account"),
         ),
         body: Align(
-            alignment: Alignment(0, 0),
+            alignment: const Alignment(0, 0),
             child: ListView(
                 children: <Widget>[
                   Column(
@@ -134,14 +186,14 @@ class _MyRegisterWidget extends State<RegisterWidget>
                         child: Center(
                             child: Text(
                           'Register Status: ${EnumHelper.getName(_registerState.state)}',
-                          style: TextStyle(fontSize: 18, color: Colors.black54),
+                          style: const TextStyle(fontSize: 18, color: Colors.black54),
                         )),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(48.0, 18.0, 48.0, 0),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(48.0, 18.0, 48.0, 0),
                         child: Align(
-                          child: Text('WebSocket:'),
                           alignment: Alignment.centerLeft,
+                          child: Text('WebSocket:'),
                         ),
                       ),
                       Padding(
@@ -150,7 +202,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                           controller: _wsUriController,
                           keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             contentPadding: EdgeInsets.all(10.0),
                             border: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
@@ -161,11 +213,11 @@ class _MyRegisterWidget extends State<RegisterWidget>
                   ),
                   Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
                         child: Align(
-                          child: Text('SIP URI:'),
                           alignment: Alignment.centerLeft,
+                          child: Text('SIP URI:'),
                         ),
                       ),
                       Padding(
@@ -174,7 +226,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                           controller: _sipUriController,
                           keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             contentPadding: EdgeInsets.all(10.0),
                             border: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
@@ -185,11 +237,11 @@ class _MyRegisterWidget extends State<RegisterWidget>
                   ),
                   Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
                         child: Align(
-                          child: Text('Authorization User:'),
                           alignment: Alignment.centerLeft,
+                          child: Text('Authorization User:'),
                         ),
                       ),
                       Padding(
@@ -200,7 +252,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(10.0),
-                            border: UnderlineInputBorder(
+                            border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
                             hintText:
                                 _authorizationUserController.text?.isEmpty ??
@@ -214,11 +266,11 @@ class _MyRegisterWidget extends State<RegisterWidget>
                   ),
                   Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
                         child: Align(
-                          child: Text('Password:'),
                           alignment: Alignment.centerLeft,
+                          child: Text('Password:'),
                         ),
                       ),
                       Padding(
@@ -228,10 +280,10 @@ class _MyRegisterWidget extends State<RegisterWidget>
                           keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10.0),
-                            border: UnderlineInputBorder(
+                            contentPadding: const EdgeInsets.all(10.0),
+                            border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
-                            hintText: _passwordController.text?.isEmpty ?? true
+                            hintText: _passwordController.text.isEmpty ?? true
                                 ? '[Empty]'
                                 : null,
                           ),
@@ -241,11 +293,11 @@ class _MyRegisterWidget extends State<RegisterWidget>
                   ),
                   Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(46.0, 18.0, 48.0, 0),
                         child: Align(
-                          child: Text('Display Name:'),
                           alignment: Alignment.centerLeft,
+                          child: Text('Display Name:'),
                         ),
                       ),
                       Padding(
@@ -254,7 +306,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                           controller: _displayNameController,
                           keyboardType: TextInputType.text,
                           textAlign: TextAlign.center,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             contentPadding: EdgeInsets.all(10.0),
                             border: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
@@ -265,18 +317,18 @@ class _MyRegisterWidget extends State<RegisterWidget>
                   ),
                   Padding(
                       padding: const EdgeInsets.fromLTRB(0.0, 18.0, 0.0, 0.0),
-                      child: Container(
+                      child: SizedBox(
                         height: 48.0,
                         width: 160.0,
                         child: MaterialButton(
-                          child: Text(
+                          color: Colors.blue,
+                          textColor: Colors.white,
+                          onPressed: () => registeredSip(),
+                          child: const Text(
                             'Register',
                             style:
                                 TextStyle(fontSize: 16.0, color: Colors.white),
                           ),
-                          color: Colors.blue,
-                          textColor: Colors.white,
-                          onPressed: () => _handleSave(context),
                         ),
                       ))
                 ])));

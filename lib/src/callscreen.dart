@@ -99,7 +99,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget> implements SipUaHelper
         callState.state == CallStateEnum.UNHOLD) {
       _hold = callState.state == CallStateEnum.HOLD;
       _holdOriginator = callState.originator!;
-      this.setState(() {});
+      setState(() {});
       return;
     }
 
