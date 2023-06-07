@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:sip_ua/sip_ua.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,12 @@ class _MyDialPadWidget extends State<DialPadWidget>
     helper.addSipUaHelperListener(this);
   }
 
+  // var videoTrack = new VideoElement();
+  // var mediaStream = new MediaStream();
+
+
+
+
   Widget? _handleCall(BuildContext context, [bool voiceonly = false]) {
     var dest = _textController.text;
     if (dest == null || dest.isEmpty) {
@@ -64,7 +71,7 @@ class _MyDialPadWidget extends State<DialPadWidget>
       );
       return null;
     }
-    helper.call(dest, voiceonly: voiceonly);
+    helper.call(dest,  voiceonly: false,);
     _preferences.setString('dest', dest);
     return null;
   }
