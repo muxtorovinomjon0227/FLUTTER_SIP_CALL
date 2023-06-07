@@ -95,7 +95,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
     UaSettings settings = UaSettings();
     settings.webSocketUrl = 'ws://cld.alovoice.uz:61040/ws';
     settings.webSocketSettings.allowBadCertificate = true;
-    var uri = '3006@cld.alovoice.uz:61040';
+    var uri = '3006@cld.alovoice.uz:65040';
     settings.uri = uri;
     settings.authorizationUser =  "3006";
     settings.password = "8b1e39";
