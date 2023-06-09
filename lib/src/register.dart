@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sip_ua/sip_ua.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterWidget extends StatefulWidget {
   final SIPUAHelper _helper;
@@ -17,10 +16,9 @@ class _MyRegisterWidget extends State<RegisterWidget>
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _authorizationUserController = TextEditingController();
   final Map<String, String> _wsExtraHeaders = {
-    'Origin': 'http://cld.alovoice.uz',
+    'Origin': 'ws://cld.alovoice.uz',
     'Host': 'cld.alovoice.uz:61040'
   };
-  late SharedPreferences _preferences;
   late RegistrationState _registerState;
 
   SIPUAHelper get helper => widget._helper;
@@ -95,11 +93,14 @@ class _MyRegisterWidget extends State<RegisterWidget>
     UaSettings settings = UaSettings();
     settings.webSocketUrl = 'wss://cld.alovoice.uz:61040/ws';
     settings.webSocketSettings.allowBadCertificate = true;
-    var uri = 'sip:3006@cld.alovoice.uz';
+    settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
+    var uri = '3006@cld.alovoice.uz';
     settings.uri = uri;
     settings.authorizationUser =  "3006";
     settings.password = "8b1e39";
     settings.displayName = "3006";
+    settings.userAgent = 'Dart SIP Client v2.17.0';
+    settings.dtmfMode = DtmfMode.RFC2833;
     helper.start(settings);
   }
 
@@ -111,7 +112,6 @@ class _MyRegisterWidget extends State<RegisterWidget>
     UaSettings settings = UaSettings();
 
     settings.webSocketUrl = _wsUriController.text;
-    settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
     settings.webSocketSettings.allowBadCertificate = true;
     //settings.webSocketSettings.userAgent = 'Dart/2.8 (dart:io) for OpenSIPS.';
 
@@ -119,8 +119,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
     settings.authorizationUser = _authorizationUserController.text;
     settings.password = _passwordController.text;
     settings.displayName = _displayNameController.text;
-    settings.userAgent = 'Dart SIP Client v1.0.0';
-    settings.dtmfMode = DtmfMode.RFC2833;
+
 
     helper.start(settings);
   }
@@ -253,8 +252,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                             border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
                             hintText:
-                                _authorizationUserController.text?.isEmpty ??
-                                        true
+                                _authorizationUserController.text.isEmpty
                                     ? '[Empty]'
                                     : null,
                           ),
@@ -281,7 +279,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
                             contentPadding: const EdgeInsets.all(10.0),
                             border: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black12)),
-                            hintText: _passwordController.text.isEmpty ?? true
+                            hintText: _passwordController.text.isEmpty
                                 ? '[Empty]'
                                 : null,
                           ),
