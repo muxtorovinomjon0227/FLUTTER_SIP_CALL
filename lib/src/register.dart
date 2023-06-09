@@ -17,7 +17,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _authorizationUserController = TextEditingController();
   final Map<String, String> _wsExtraHeaders = {
-    'Origin': 'ws://cld.alovoice.uz',
+    'Origin': 'http://cld.alovoice.uz',
     'Host': 'cld.alovoice.uz:61040'
   };
   late SharedPreferences _preferences;

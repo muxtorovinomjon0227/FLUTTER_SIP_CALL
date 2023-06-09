@@ -49,10 +49,9 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
   @override
   initState() {
     super.initState();
-    // _initRenderers();
+    _initRenderers();
     helper!.addSipUaHelperListener(this);
     _startTimer();
-
   }
 
   @override
@@ -75,7 +74,6 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
         _timer.cancel();
       }
     });
-    _initRenderers();
   }
 
   void _initRenderers() async {
@@ -128,7 +126,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
 
     switch (callState.state) {
       case CallStateEnum.STREAM:
-        // _handelStreams(callState);
+        _handelStreams(callState);
         break;
       case CallStateEnum.ENDED:
       case CallStateEnum.FAILED:
