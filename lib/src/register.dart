@@ -17,7 +17,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _authorizationUserController = TextEditingController();
   final Map<String, String> _wsExtraHeaders = {
-    'Origin': 'https://cld.alovoice.uz',
+    'Origin': 'ws://cld.alovoice.uz',
     'Host': 'cld.alovoice.uz:61040'
   };
   late SharedPreferences _preferences;
@@ -93,16 +93,14 @@ class _MyRegisterWidget extends State<RegisterWidget>
 
    void registeredSip() async {
     UaSettings settings = UaSettings();
-    settings.webSocketUrl = 'ws://cld.alovoice.uz:61040/ws';
+    settings.webSocketUrl = 'wss://cld.alovoice.uz:61040/ws';
     settings.webSocketSettings.allowBadCertificate = true;
-    var uri = '3006@cld.alovoice.uz:65040';
+    var uri = 'sip:3006@cld.alovoice.uz';
     settings.uri = uri;
     settings.authorizationUser =  "3006";
     settings.password = "8b1e39";
     settings.displayName = "3006";
     helper.start(settings);
-    print("Bu yerda connect bo'lgani ${helper.connected}");
-    print("Bu yerda connect bo'lgani ${helper.connecting}");
   }
 
 

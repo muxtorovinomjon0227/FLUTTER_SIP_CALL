@@ -128,7 +128,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
 
     switch (callState.state) {
       case CallStateEnum.STREAM:
-        _handelStreams(callState);
+        // _handelStreams(callState);
         break;
       case CallStateEnum.ENDED:
       case CallStateEnum.FAILED:
