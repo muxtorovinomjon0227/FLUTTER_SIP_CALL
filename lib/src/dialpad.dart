@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -6,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sip_ua/sip_ua.dart';
 
 import 'widgets/action_button.dart';
+
 
 class DialPadWidget extends StatefulWidget {
   final SIPUAHelper? _helper;
@@ -192,7 +195,11 @@ class _MyDialPadWidget extends State<DialPadWidget>
                   ActionButton(
                     icon: Icons.dialer_sip,
                     fillColor: Colors.green,
-                    onPressed: () => _handleCall(context, true),
+                    onPressed: () {
+                      // RTCVideoRenderer renderer = new RTCVideoRenderer();
+                      // renderer.initialize();
+                      helper!.call("3007", voiceonly: true, mediaStream:  null);
+                    },
                   ),
                   ActionButton(
                     icon: Icons.keyboard_arrow_left,
