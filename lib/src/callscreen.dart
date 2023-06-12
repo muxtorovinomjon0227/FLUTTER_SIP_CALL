@@ -98,8 +98,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
 
   @override
   void callStateChanged(Call call, CallState callState) {
-    if (callState.state == CallStateEnum.HOLD ||
-        callState.state == CallStateEnum.UNHOLD) {
+    if (callState.state == CallStateEnum.HOLD || callState.state == CallStateEnum.UNHOLD) {
       _hold = callState.state == CallStateEnum.HOLD;
       _holdOriginator = callState.originator;
       setState(() {});
@@ -122,6 +121,7 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
 
     if (callState.state != CallStateEnum.STREAM) {
       _state = callState.state;
+      _handelStreams(callState);
     }
 
     switch (callState.state) {
@@ -171,26 +171,31 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
   }
 
   void _handelStreams(CallState event) async {
-    MediaStream? stream = event.stream;
-    if (event.originator == 'local') {
-      if (_localRenderer != null) {
-        _localRenderer!.srcObject = stream;
-      }
-      if (!kIsWeb && !WebRTC.platformIsDesktop) {
-        event.stream?.getAudioTracks().first.enableSpeakerphone(false);
-      }
-      _localStream = stream;
-    }
-    if (event.originator == 'remote') {
-      if (_remoteRenderer != null) {
-        _remoteRenderer!.srcObject = stream;
-      }
-      _remoteStream = stream;
-    }
 
-    setState(() {
-      _resizeLocalVideo();
-    });
+    if(event.stream != null) {
+      MediaStream stream = event.stream!;
+
+      if (event.originator == 'local') {
+        if (_localRenderer != null) {
+          _localRenderer!.srcObject = stream;
+        }
+        event.stream
+            ?.getAudioTracks()
+            .first
+            .enableSpeakerphone(false);
+        _localStream = stream;
+      }
+      if (event.originator == 'remote') {
+        if (_remoteRenderer != null) {
+          _remoteRenderer!.srcObject = stream;
+        }
+        _remoteStream = stream;
+      }
+
+      this.setState(() {
+        _resizeLocalVideo();
+      });
+    }
   }
 
   void _resizeLocalVideo() {

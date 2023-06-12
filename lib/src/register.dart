@@ -101,6 +101,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
     settings.displayName = "3006";
     settings.userAgent = 'Dart SIP Client v2.17.0';
     settings.dtmfMode = DtmfMode.RFC2833;
+    settings.iceGatheringTimeout = 1000;
     helper.start(settings);
   }
 
