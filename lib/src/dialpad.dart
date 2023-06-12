@@ -44,13 +44,11 @@ class _MyDialPadWidget extends State<DialPadWidget>
     helper!.addSipUaHelperListener(this);
   }
 
-  Future<Widget?> _handleCall(BuildContext context,
-      [bool voiceOnly = false]) async {
+  Future<Widget?> _handleCall(BuildContext context, [bool voiceOnly = false]) async {
     var dest = "3007";
     if (defaultTargetPlatform == TargetPlatform.android ||
         defaultTargetPlatform == TargetPlatform.iOS) {
       await Permission.microphone.request();
-      await Permission.camera.request();
     }
     if (dest == null || dest.isEmpty) {
       showDialog<void>(
@@ -74,7 +72,7 @@ class _MyDialPadWidget extends State<DialPadWidget>
       return null;
     }
 
-    final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
+    final mediaConstraints = <String, dynamic>{'audio': true, 'video': false};
 
     MediaStream mediaStream;
 
