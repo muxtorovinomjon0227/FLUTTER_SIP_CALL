@@ -38,6 +38,7 @@ dependencies:
   shared_preferences:
   sip_ua: ^0.5.8
   permission_handler: ^10.3.0
+  flutter_webrtc: ^0.9.46
 
 dev_dependencies:
   flutter_test:

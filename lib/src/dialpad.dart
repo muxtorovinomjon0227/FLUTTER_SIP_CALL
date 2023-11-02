@@ -33,7 +33,7 @@ class _MyDialPadWidget extends State<DialPadWidget>
 
   void _loadSettings() async {
     _preferences = await SharedPreferences.getInstance();
-    _dest = _preferences.getString('dest') ?? 'sip:hello_jssip@tryit.jssip.net';
+    _dest = _preferences.getString('dest') ?? 'sip:2005@cld.alovoice.uz';
     _textController = TextEditingController(text: _dest);
     _textController!.text = _dest!;
 
@@ -45,11 +45,12 @@ class _MyDialPadWidget extends State<DialPadWidget>
   }
 
   Future<Widget?> _handleCall(BuildContext context, [bool voiceOnly = false]) async {
-    var dest = "3007";
-    if (defaultTargetPlatform == TargetPlatform.android ||
-        defaultTargetPlatform == TargetPlatform.iOS) {
+    var dest = "sip:2005@cld.alovoice.uz:61113";
+    if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
       await Permission.microphone.request();
     }
+    await Permission.microphone.request();
+    await Permission.camera.request();
     if (dest == null || dest.isEmpty) {
       showDialog<void>(
         context: context,

@@ -16,7 +16,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
   final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _authorizationUserController = TextEditingController();
   final Map<String, String> _wsExtraHeaders = {
-    'Origin': 'ws://cld.alovoice.uz',
+    'Origin': 'wss://cld.alovoice.uz',
     'Host': 'cld.alovoice.uz:61040'
   };
   late RegistrationState _registerState;
@@ -28,37 +28,13 @@ class _MyRegisterWidget extends State<RegisterWidget>
     super.initState();
     _registerState = helper.registerState;
     helper.addSipUaHelperListener(this);
-    // _loadSettings();
   }
 
   @override
   deactivate() {
     super.deactivate();
     helper.removeSipUaHelperListener(this);
-    // _saveSettings();
   }
-  //
-  // void _loadSettings() async {
-  //   _preferences = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     _wsUriController.text =
-  //         _preferences.getString('ws_uri') ?? 'wss://cld.alovoice.uz:61040';
-  //     _sipUriController.text =
-  //         _preferences.getString('sip_uri') ?? 'https://cld.alovoice.uz:65040';
-  //     _displayNameController.text =
-  //         _preferences.getString('display_name') ?? 'Flutter SIP UA';
-  //     _passwordController.text = _preferences.getString('password') ?? '8b1e39';
-  //     _authorizationUserController.text = _preferences.getString('auth_user') ?? "3006";
-  //   });
-  // }
-  //
-  // void _saveSettings() {
-  //   _preferences.setString('ws_uri', _wsUriController.text);
-  //   _preferences.setString('sip_uri', _sipUriController.text);
-  //   _preferences.setString('display_name', _displayNameController.text);
-  //   _preferences.setString('password', _passwordController.text);
-  //   _preferences.setString('auth_user', _authorizationUserController.text);
-  // }
 
   @override
   void registrationStateChanged(RegistrationState state) {
@@ -77,7 +53,7 @@ class _MyRegisterWidget extends State<RegisterWidget>
           content: Text('Please enter $alertFieldName!'),
           actions: <Widget>[
             TextButton(
-              child: Text('Ok'),
+              child: const Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -90,19 +66,53 @@ class _MyRegisterWidget extends State<RegisterWidget>
 
 
    void registeredSip() async {
-    UaSettings settings = UaSettings();
-    settings.webSocketUrl = 'wss://cld.alovoice.uz:61040/ws';
-    settings.webSocketSettings.allowBadCertificate = true;
-    settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
-    var uri = '3006@cld.alovoice.uz';
-    settings.uri = uri;
-    settings.authorizationUser =  "3006";
-    settings.password = "8b1e39";
-    settings.displayName = "3006";
-    settings.userAgent = 'Dart SIP Client v2.17.0';
-    settings.dtmfMode = DtmfMode.RFC2833;
-    settings.iceGatheringTimeout = 1000;
-    helper.start(settings);
+    // UaSettings settings = UaSettings();
+    // settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
+    // settings.webSocketSettings.allowBadCertificate = true;
+    // settings.webSocketSettings.extraHeaders = {
+    //   'Origin': 'https://cld.alovoice.uz',
+    //   'Host': 'cld.alovoice.uz:61113'
+    // };
+    // settings.uri = "2005@cld.alovoice.uz:61113";
+    // settings.authorizationUser =  "2005";
+    // settings.password = "3b3d7b";
+    // settings.displayName = "2005";
+    // settings.userAgent = 'AloVoice Client v2.17.0';
+    // settings.dtmfMode = DtmfMode.RFC2833;
+    // settings.iceGatheringTimeout = 100;
+    // helper.start(settings);
+
+     // UaSettings settings = UaSettings();
+     // settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
+     // settings.webSocketSettings.allowBadCertificate = true;
+     // settings.webSocketSettings.extraHeaders = {
+     //   'Origin': 'https://cld.alovoice.uz',
+     //   'Host': 'cld.alovoice.uz:61113'
+     // };
+     // settings.uri = "2003@cld.alovoice.uz:61113";
+     // settings.authorizationUser =  "2003";
+     // settings.password = "95df9e";
+     // settings.displayName = "2003";
+     // settings.userAgent = 'AloVoice Client v2.17.0';
+     // settings.dtmfMode = DtmfMode.RFC2833;
+     // settings.iceGatheringTimeout = 100;
+     // helper.start(settings);
+
+     UaSettings settings = UaSettings();
+     settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
+     settings.webSocketSettings.allowBadCertificate = true;
+     settings.webSocketSettings.extraHeaders = {
+       // 'Origin': 'https://cld.alovoice.uz',
+       // 'Host': 'cld.alovoice.uz:61113'
+     };
+     settings.uri = "2004@cld.alovoice.uz:61113";
+     settings.authorizationUser =  "2004";
+     settings.password = "1a8cba";
+     settings.displayName = "2004";
+     settings.userAgent = 'AloVoice Client v2.17.0';
+     settings.dtmfMode = DtmfMode.RFC2833;
+     settings.iceGatheringTimeout = 100;
+     helper.start(settings);
   }
 
 
@@ -125,44 +135,6 @@ class _MyRegisterWidget extends State<RegisterWidget>
     helper.start(settings);
   }
 
-  // void _handleSave(BuildContext context) {
-  //
-  //   UaSettings settings = UaSettings();
-  //   settings.webSocketUrl = "wss://cld.alovoice.uz:61040";
-  //   settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
-  //   settings.webSocketSettings.allowBadCertificate = true;
-  //   settings.uri = "sip:3006@cld.alovoice.uz";
-  //   settings.authorizationUser = "3006";
-  //   settings.password = "8b1e39";
-  //   settings.displayName = "3006";
-  //   settings.userAgent = 'Dart SIP Client v1.0.0';
-  //   settings.dtmfMode = DtmfMode.RFC2833;
-  //
-  //   helper.start(settings);
-  // }
-
-  // void _handleSave(BuildContext context) {
-  //   // if (_wsUriController.text == null) {
-  //   //   _alert(context, "WebSocket URL");
-  //   // } else if (_sipUriController.text == null) {
-  //   //   _alert(context, "SIP URI");
-  //   // }
-  //
-  //   UaSettings settings = UaSettings();
-  //
-  //   settings.webSocketUrl = "wss://cld.alovoice.uz:61040";
-  //   settings.webSocketSettings.extraHeaders = _wsExtraHeaders;
-  //   settings.webSocketSettings.allowBadCertificate = true;
-  //   // settings.webSocketSettings.userAgent = 'Dart/2.8 (dart:io) for OpenSIPS.';
-  //   settings.uri = "3006@cld.alovoice.uz:65040";
-  //   settings.authorizationUser = "3006";
-  //   settings.password = "8b1e39";
-  //   settings.displayName = "8b1e39";
-  //   settings.userAgent = 'Dart SIP Client';
-  //   settings.dtmfMode = DtmfMode.RFC2833;
-  //
-  //   helper.start(settings);
-  // }
 
   @override
   Widget build(BuildContext context) {
