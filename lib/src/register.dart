@@ -66,21 +66,21 @@ class _MyRegisterWidget extends State<RegisterWidget>
 
 
    void registeredSip() async {
-    // UaSettings settings = UaSettings();
-    // settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
-    // settings.webSocketSettings.allowBadCertificate = true;
-    // settings.webSocketSettings.extraHeaders = {
-    //   'Origin': 'https://cld.alovoice.uz',
-    //   'Host': 'cld.alovoice.uz:61113'
-    // };
-    // settings.uri = "2005@cld.alovoice.uz:61113";
-    // settings.authorizationUser =  "2005";
-    // settings.password = "3b3d7b";
-    // settings.displayName = "2005";
-    // settings.userAgent = 'AloVoice Client v2.17.0';
-    // settings.dtmfMode = DtmfMode.RFC2833;
-    // settings.iceGatheringTimeout = 100;
-    // helper.start(settings);
+    UaSettings settings = UaSettings();
+    settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
+    settings.webSocketSettings.allowBadCertificate = true;
+    settings.webSocketSettings.extraHeaders = {
+      'Origin': 'https://cld.alovoice.uz',
+      'Host': 'cld.alovoice.uz:61113'
+    };
+    settings.uri = "2005@cld.alovoice.uz:61113";
+    settings.authorizationUser =  "2005";
+    settings.password = "3b3d7b";
+    settings.displayName = "2005";
+    settings.userAgent = 'AloVoice Client v2.17.0';
+    settings.dtmfMode = DtmfMode.RFC2833;
+    settings.iceGatheringTimeout = 100;
+    helper.start(settings);
 
      // UaSettings settings = UaSettings();
      // settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
@@ -98,21 +98,21 @@ class _MyRegisterWidget extends State<RegisterWidget>
      // settings.iceGatheringTimeout = 100;
      // helper.start(settings);
 
-     UaSettings settings = UaSettings();
-     settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
-     settings.webSocketSettings.allowBadCertificate = true;
-     settings.webSocketSettings.extraHeaders = {
-       // 'Origin': 'https://cld.alovoice.uz',
-       // 'Host': 'cld.alovoice.uz:61113'
-     };
-     settings.uri = "2004@cld.alovoice.uz:61113";
-     settings.authorizationUser =  "2004";
-     settings.password = "1a8cba";
-     settings.displayName = "2004";
-     settings.userAgent = 'AloVoice Client v2.17.0';
-     settings.dtmfMode = DtmfMode.RFC2833;
-     settings.iceGatheringTimeout = 100;
-     helper.start(settings);
+     // UaSettings settings = UaSettings();
+     // settings.webSocketUrl = 'wss://cld.alovoice.uz:61113/ws';
+     // settings.webSocketSettings.allowBadCertificate = true;
+     // settings.webSocketSettings.extraHeaders = {
+     //   // 'Origin': 'https://cld.alovoice.uz',
+     //   // 'Host': 'cld.alovoice.uz:61113'
+     // };
+     // settings.uri = "2004@cld.alovoice.uz:61113";
+     // settings.authorizationUser =  "2004";
+     // settings.password = "1a8cba";
+     // settings.displayName = "2004";
+     // settings.userAgent = 'AloVoice Client v2.17.0';
+     // settings.dtmfMode = DtmfMode.RFC2833;
+     // settings.iceGatheringTimeout = 100;
+     // helper.start(settings);
   }
 
 

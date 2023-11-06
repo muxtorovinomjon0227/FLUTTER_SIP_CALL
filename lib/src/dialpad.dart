@@ -29,6 +29,13 @@ class _MyDialPadWidget extends State<DialPadWidget>
     receivedMsg = "";
     _bindEventListeners();
     _loadSettings();
+    getPermission();
+  }
+
+
+  Future<void> getPermission()async {
+    await Permission.microphone.request();
+    await Permission.camera.request();
   }
 
   void _loadSettings() async {
@@ -45,13 +52,12 @@ class _MyDialPadWidget extends State<DialPadWidget>
   }
 
   Future<Widget?> _handleCall(BuildContext context, [bool voiceOnly = false]) async {
-    var dest = "sip:2005@cld.alovoice.uz:61113";
+    var dest = "sip:2004@cld.alovoice.uz:61113";
     if (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS) {
       await Permission.microphone.request();
     }
-    await Permission.microphone.request();
-    await Permission.camera.request();
-    if (dest == null || dest.isEmpty) {
+
+    if (dest.isEmpty) {
       showDialog<void>(
         context: context,
         barrierDismissible: false,
